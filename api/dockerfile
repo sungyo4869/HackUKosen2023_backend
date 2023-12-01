@@ -1,0 +1,10 @@
+FROM golang:latest
+
+WORKDIR /app/
+
+COPY ./src/go.mod .
+COPY ./src/go.sum .
+
+WORKDIR /go/src/api/
+
+CMD ["sh", "./start_app.sh"]
