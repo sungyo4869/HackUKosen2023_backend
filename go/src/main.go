@@ -9,7 +9,7 @@ import (
 func main() {
     router := gin.Default()
 
-    router.GET("/hello", func(ctx *gin.Context) {
+    router.GET("/", func(ctx *gin.Context) {
         ctx.String(200, "Hello World")
     })
 
