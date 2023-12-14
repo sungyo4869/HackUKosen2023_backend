@@ -6,16 +6,14 @@ services:
     build:
       context: .
       dockerfile: ./api/dockerfile
-    working_dir: /app/
-    command: /bin/sh -c "go run main.go"
-    stdin_open: true
-    tty: true
     volumes:
       - ./src:/app/
     ports:
       - "8080:8080"
     depends_on:
      - mysql
+    stdin_open: true
+    tty: true
 
   mysql:
     image: hackdenoel-mysql
@@ -23,9 +21,14 @@ services:
     build:
       context: .
       dockerfile: ./db/dockerfile
+    hostname: mysql
     expose:
       - 3306:3306
     environment:
-      - MYSQL_ROOT_PASSWORD=pass
-      - MYSQL_DATABASE=noel-db
+      LANG: C.UTF-8
+      TZ: Asia/Tokyo
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: noel-db
+    volumes:
+      - ./db/initdb.d:/docker-entrypoint-initdb.d
     tty: True
