@@ -42,8 +42,15 @@ func GetRanking() {
 	// ソートしたランキングのリストを返す
 }
 
-func CreateUser() {
+func CreateUser(newUser *User) error {
 	// ユーザーの情報をDBに格納する
+    result := db.Create(&newUser)
+
+    if result.Error != nil {
+        return result.Error
+    }
+
+    return nil
 }
 
 func SearchUser(){
