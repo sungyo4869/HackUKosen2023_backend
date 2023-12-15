@@ -1,7 +1,7 @@
 package model
 
-type HighScores struct {
-    ScoreID int
-    Score int
-    UserID string
+type Scores struct {
+    ScoreID int `json:"score_id"`
+    Score int `json:"score"`
+    UserID int `json:"user_id"`
 }
