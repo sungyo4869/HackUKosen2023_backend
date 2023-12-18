@@ -1,10 +1,10 @@
 package model
 
-type UserScore struct{
+type UserScore struct {
+	UserName string
 	Score int
-	UserName int
 }
 
-type Rankings struct{
-	Scores []UserScore
+type Ranking struct{
+	Ranking []UserScore
 }
