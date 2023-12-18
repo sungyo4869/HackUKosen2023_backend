@@ -6,14 +6,20 @@
 
 package model
 
-import(
+import (
+	"os"
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-    "gorm.io/driver/mysql"
-    _ "github.com/jinzhu/gorm/dialects/mysql"
+
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 var db *gorm.DB
 var err error
+var secretKey = os.Getenv("SECRET_KEY")
 
 func InitializeDB() {
     USER := "root"
@@ -29,56 +35,116 @@ func InitializeDB() {
     }
 }
 
+func InitHighScore(){
+    
+}
 
-func GetHighScore(){
+func GetHighScore(userID int) (int, error){
     // ハイスコアを返す
+
+    var userScore Scores
+    result := db.Where("user_id = ?", userID).First(&userScore)
+
+    if result.Error != nil {
+        return -1, result.Error
+    }
+
+    return userScore.Score, nil
 }
 
-func UpdateHighScore(){
-    // ハイスコアを更新する
+func UpdateHighScore(newHighScore *Scores) error {
+
+    var existingScore Scores
+
+    result := db.Where("user_id = ?", newHighScore.UserID).First(&existingScore)
+	
+	if result.Error == nil {
+		// UserIDが一致する行が存在する場合、削除
+		db.Unscoped().Where("user_id = ?", existingScore.UserID).Delete(&existingScore)
+	}
+	
+	// 新しいデータを挿入
+	newData := Scores{Score: newHighScore.Score, UserID: newHighScore.UserID}
+	result = db.Create(&newData)
+
+	return result.Error
 }
 
-func GetRanking() {
+func GetRanking() ([]Scores, error) {
 	// ソートしたランキングのリストを返す
+
+    var ranking []Scores
+
+    result := db.Order("score desc").Find(&ranking)
+
+    if result.Error != nil {
+        return []Scores{}, result.Error
+    }
+
+    return ranking, result.Error
 }
 
 func CreateUser(newUser *User) error {
 	// ユーザーの情報をDBに格納する
     result := db.Create(&newUser)
 
-    if result.Error != nil {
-        return result.Error
-    }
-
-    return nil
+    return result.Error
 }
 
-func SearchUser(){
-	// ユーザーがいるかどうか確認する
+func GetUserID(userInput *User) (int, error) {
+
+    var user *User
+
+	result := db.Where("user_name = ? AND password = ?", userInput.UserName, userInput.Password).First(&user)
+
+    return user.UserID, result.Error
+}
+
+func GetUserName(userID int) (string, error) {
+    var user *User
+
+    result := db.Where("user_id = ?", userID).First(&user)
+
+    return user.UserName, result.Error
 }
 
 func DeleteUser(){
 	// ユーザーの情報を削除する
 }
 
-func GetUserID(){
-    // トークンからユーザーIDを取得
+func GenerateToken(userID int) (string, error){
+
+    expirationTime := time.Now().Add(time.Hour * 1).Unix()
+
+	claims := jwt.MapClaims{
+		"user_id": userID,
+		"exp":     expirationTime, // トークンの有効期限（1時間）
+	}
+
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+    // secretKey を使ってトークンを署名
+    signedToken, err := token.SignedString([]byte(secretKey))
+    if err != nil {
+        return "", err
+    }
+
+    return signedToken, nil
 }
 
-
-func CreateToken(){
-    
-	// トークンを生成する
-}
-
-func SearchToken(){
-	// トークンがDBに存在するか確認する
-}
-
-func GetScore(){
+func GetScore(cities []string) (int, error) {
     // 都市ごとに加算されるスコアを返す
-}
 
-func DeleteToken(){
-	// トークンを削除する 
+    totalScore := 0
+
+    for _, city := range cities {
+        var cityScore Cities
+        result := db.Where("city_name = ?", city).First(&cityScore)
+        if result.Error != nil {
+            return -1, result.Error
+        }
+        totalScore += cityScore.CityScore
+    }
+
+    return totalScore, nil
 }
