@@ -37,7 +37,7 @@ VALUES
     (3, 'こうた', 'ktPass'),
     (4, 'たけし', 'tkPass'),
     (5, 'かける', 'kkPass'),
-    (6, 'よしこ', 'ysPass')
+    (6, 'よしこ', 'ysPass');
 
 
 INSERT INTO scores
@@ -47,7 +47,7 @@ VALUES
     (2, 0, 2),
     (3, 0, 3),
     (4, 0, 4),
-    (5, 0, 5);
+    (5, 0, 5),
     (6, 0, 6);
 
 INSERT INTO cities
