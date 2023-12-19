@@ -35,8 +35,13 @@ func InitializeDB() {
     }
 }
 
-func InitHighScore(){
-    
+func InitHighScore(userID int){
+    score := Scores{
+        UserID: userID,
+        Score: 0,
+    }
+
+    db.Create(&score)
 }
 
 func GetHighScore(userID int) (int, error){
@@ -106,10 +111,6 @@ func GetUserName(userID int) (string, error) {
     result := db.Where("user_id = ?", userID).First(&user)
 
     return user.UserName, result.Error
-}
-
-func DeleteUser(){
-	// ユーザーの情報を削除する
 }
 
 func GenerateToken(userID int) (string, error){
