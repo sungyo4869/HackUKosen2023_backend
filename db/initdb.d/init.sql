@@ -39,7 +39,6 @@ VALUES
     (5, 'かける', 'kkPass'),
     (6, 'よしこ', 'ysPass');
 
-
 INSERT INTO scores
     (score_id, score, user_id)
 VALUES

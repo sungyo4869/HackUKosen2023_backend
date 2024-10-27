@@ -17,7 +17,7 @@ func GetRouter() *gin.Engine {
 	
 	// ランキングの取得
 	r.GET("/ranking", middleware.AuthMiddleware(), getRanking)
-	// 首都を引数としてスコアを返す
+	// 首都を引数としてスコアを返す                          
 	r.POST("/score", middleware.AuthMiddleware(), getScore)
 	// ハイスコアかの判定、ハイスコアならランキングを更新して返す、じゃないならそのままの値を返す
 	r.POST("/result", middleware.AuthMiddleware(), getResult)

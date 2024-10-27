@@ -2,7 +2,6 @@ package controller
 
 import (
 	"src/model"
-	"fmt"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -46,7 +45,7 @@ func signUp(c *gin.Context) {
 	_, result := model.GetUserID(&newUser)
 
 	if result == nil{
-		c.JSON(200, gin.H{"error":"ユーザーネームはすでに使用されています"})
+		c.JSON(400, gin.H{"error":"ユーザー名が重複しています"})
 		return
 	}
 
@@ -67,10 +66,7 @@ func signUp(c *gin.Context) {
 	}
 
 	model.InitHighScore(userID)
-
-	model.InitHighScore(newUser.UserID)
-
-	c.JSON(200, gin.H{"message": "ユーザーが正常に登録されました"})
+	login(c)
 }
 
 func getRanking(c *gin.Context){
@@ -89,15 +85,11 @@ func getRanking(c *gin.Context){
 	}
 
 	for _, userScore := range scores{
-		fmt.Println(userScore.UserID)
-		fmt.Println(userScore.Score)
-		fmt.Println(userScore.ScoreID)
 
 		username, result := model.GetUserName(userScore.UserID)
-		fmt.Println(username)
 
 		if result != nil{
-			c.JSON(400, gin.H{"error":"ランキングの取得に失敗しましたあ"})
+			c.JSON(404, gin.H{"error":"usernameの取得に失敗しましたあ"})
 			return
 		}
 
